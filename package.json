@@ -4,7 +4,8 @@
   "description": "Simple book api",
   "main": "index.js",
   "scripts": {
-    "start": "nodemon app.ts"
+    "start": "nodemon app.ts",
+    "models": "set NODE_ENV=development && node database/sequelize/auto.js"
   },
   "author": "Sócrates Manaure @smanaure93",
   "license": "ISC",
@@ -18,6 +19,10 @@
   "dependencies": {
     "cors": "^2.8.5",
     "express": "^4.18.2",
-    "helmet": "^7.0.0"
+    "helmet": "^7.0.0",
+    "pg": "^8.7.1",
+    "sequelize": "^6.9.0",
+    "sequelize-auto": "0.8.8",
+    "joi": "^17.4.2"
   }
 }
