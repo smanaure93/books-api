@@ -5,4 +5,4 @@ export type Book = {
   pages: number;
 };
 
-export type CreateBookRequest = Book & { authors: number[] };
+export type CreateBookRequest = Book & { authors: number[], inspirations?: number[] };

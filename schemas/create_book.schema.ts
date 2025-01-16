@@ -5,4 +5,5 @@ export default joi.object({
   chapters: joi.number().required(),
   pages: joi.number().required(),
   authors: joi.array().items(joi.number()).required(),
+  inspirations: joi.array().items(joi.number()),
 });

@@ -19,3 +19,12 @@ CREATE TABLE
     FOREIGN KEY (author_id) REFERENCES authors (id),
     FOREIGN KEY (book_id) REFERENCES books (id)
   );
+
+CREATE TABLE
+  books_inspirations (
+    id serial PRIMARY KEY,
+    book_id INT NOT NULL,
+    inspiration_id INT NOT NULL,
+    FOREIGN KEY (book_id) REFERENCES books (id),
+    FOREIGN KEY (inspiration_id) REFERENCES books (id)
+  );
