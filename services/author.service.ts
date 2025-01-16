@@ -13,6 +13,17 @@ class AuthorService {
     this.authorBookModel = authorBookModel;
   }
 
+  /**
+   * This method creates a new author record in the database. It takes an author model as
+   * an argument and returns a generic response containing the status, description, and
+   * data (author) retrieved from the database. If the author already exists in the
+   * database, it returns a BAD_REQUEST status with an appropriate description.
+   *
+   * @param {Author} author The author model to be created.
+   * @returns {Promise<GenericResponse>} A promise that resolves to a generic response
+   * containing the status, description, and data (author) retrieved from the database.
+   * @throws Will throw an error if there is an issue creating the author in the database.
+   */
   async create(author: Author) {
     const loggerIdentifier = `[${this.constructor.name}].[${this.create.name}]`;
     try {
@@ -48,6 +59,18 @@ class AuthorService {
     }
   }
 
+/**
+ * Fetches all authors from the database including their associated books.
+ * The method returns a generic response containing the status, description,
+ * and the data (list of authors with their books) retrieved from the database.
+ * In case of an error during retrieval, it returns a BACKEND_ERROR status with
+ * an appropriate description.
+ *
+ * @returns {Promise<GenericResponse>} A promise that resolves to a generic response
+ * containing the status, description, and data (list of authors) retrieved from the database.
+ * @throws Will throw an error if there is an issue retrieving the authors from the database.
+ */
+
   async getAll() {
     const loggerIdentifier = `[${this.constructor.name}].[${this.getAll.name}]`;
     try {
@@ -58,41 +81,21 @@ class AuthorService {
         description: "Ocurrió un error al buscar autores",
       };
 
-      const authorsOnDb = await this.authorModel.findAll();
-      const authors = [];
-      const authorsIds = authorsOnDb.map((author) => {
-        authors.push({
-          ...author.dataValues,
-          books: [],
-        });
-        return author.id;
-      });
-
-      const authorBookRelationship = await this.authorBookModel.findAll({
-        where: {
-          authorId: {
-            [Op.in]: authorsIds,
-          },
+      // Get raw database data
+      const authorsOnDb = await this.authorModel.findAll({
+        include: {
+          model: this.authorBookModel,
+          as: "authorBooks",
+          include: { model: this.bookModel, as: "book" },
         },
-        include: "book",
-      });
-      const booksInfo = [];
-      authorBookRelationship.forEach((info) => {
-        booksInfo.push({ ...info.book.dataValues, authorId: info.authorId });
       });
 
-      booksInfo.forEach((info) => {
-        authors.forEach((author) => {
-          if (author.id === info.authorId)
-            author.books.push({
-              id: info.id,
-              title: info.title,
-              chapters: info.chapters,
-              pages: info.pages,
-              pageAverage: (info.pages / info.chapters).toFixed(2),
-            });
-        });
-      });
+      // Map to human readable
+      const authors = authorsOnDb.map((author) => ({
+        id: author.id,
+        name: author.name,
+        books: author.authorBooks.map((book) => book.book),
+      }));
 
       response.status = HTTP_STATUS.SUCCESS;
       response.description = "Autores obtenidos exitosamente";
